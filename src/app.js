@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
+const mongoose = require('mongoose');
 
 require('dotenv').config();
 
@@ -25,5 +26,16 @@ app.use('/api', api);
 
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);
+
+// Connect database
+mongoose.connect(process.env.MONGO_DB, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Database Connection Established!');
+    app.emit('databaseReady');
+  })
+  .catch((err) => {
+    console.log('Error in Database Connection!');
+    console.log(err);
+  });
 
 module.exports = app;
