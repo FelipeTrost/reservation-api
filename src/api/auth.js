@@ -9,7 +9,7 @@ const router = express.Router();
 // if the access token is compromised, it isn't that bad, beacause it only lasts 30min
 
 
-router.get('/', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const {username, password} = req.body;
     
@@ -51,12 +51,12 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/refresh', async (req, res) =>{
+router.post('/refresh', async (req, res) =>{
     try {
         const refresh_token = req.cookies.jid;
 
         const payload = jsonwebtoken.verify(refresh_token, process.env.REFRESH_JWT);
-
+        console.log(payload);
         const user = await User.findById(payload.user_id);
 
         if(!user)
@@ -69,7 +69,7 @@ router.get('/refresh', async (req, res) =>{
         user.refreshTokenVersion += 1;
         await user.save()
 
-        const access_token = jsonwebtoken.sign({user_id :user._id}, process.env.ACCESS_JWT, { expiresIn: "30m" })
+        const access_token = jsonwebtoken.sign({user_id :user._id}, process.env.ACCESS_JWT, { expiresIn: "10s" })
         const refresh_tokenNew = jsonwebtoken.sign({
             user_id :user._id,
             tokenVersion: user.refreshTokenVersion        
