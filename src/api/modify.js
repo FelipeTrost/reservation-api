@@ -66,16 +66,21 @@ router.put('/table', async (req, res) => {
 });
 
 router.get('/table', async (req, res) => {
-    const { tableId } = req.body;
+    const { tableId } = req.query;
     try {
-        const table = await Table.findById(tableId);
+        let response;
 
-        if(!table)
+        if(tableId)
+            response = await Table.findById(tableId);
+        else
+            response = await Table.find();
+
+        if(!result)
             throw new Error("No table found with the given id");
 
         res.json({
             success: true,
-            table
+            response
         });
     } catch (error) {
         console.error(error);
@@ -164,16 +169,21 @@ router.put('/timeslot', async (req, res) => {
 });
 
 router.get('/timeslot', async (req, res) => {
-    const { timeslotId } = req.body;
+    const { timeslotId } = req.query;
     try {
-        const timeslot = await TimeSlot.findById(timeslotId);
+        let response;
 
-        if(!timeslot)
+        if(timeslotId)
+            response = await TimeSlot.findById(timeslotId);
+        else
+            response = await TimeSlot.find();
+
+        if(!response)
             throw new Error("No Timeslot found with the given id");
 
         res.json({
             success: true,
-            timeslot
+            response 
         });
     } catch (error) {
         console.error(error);
