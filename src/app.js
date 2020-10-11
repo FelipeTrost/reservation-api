@@ -12,9 +12,12 @@ const api = require('./api');
 
 const app = express();
 
+app.use(cors({
+  origin: process.env.CORS_ADRESS,
+  credentials: true
+}));
 app.use(morgan('dev'));
 app.use(helmet());
-app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 
