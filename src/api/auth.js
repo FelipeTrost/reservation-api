@@ -69,7 +69,7 @@ router.post('/refresh', async (req, res) =>{
         user.refreshTokenVersion += 1;
         await user.save()
 
-        const access_token = jsonwebtoken.sign({user_id :user._id}, process.env.ACCESS_JWT, { expiresIn: "10s" })
+        const access_token = jsonwebtoken.sign({user_id :user._id}, process.env.ACCESS_JWT, { expiresIn: "30m" })
         const refresh_tokenNew = jsonwebtoken.sign({
             user_id :user._id,
             tokenVersion: user.refreshTokenVersion        
