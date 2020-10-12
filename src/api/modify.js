@@ -7,6 +7,35 @@ const auth_middleware = require('./auth_middleware');
 const Booking = require('../models/Booking');
 
 const router = express.Router();
+
+// PUBLIC ENDPOINTS
+
+router.get('/timeslot', async (req, res) => {
+    const { timeslotId } = req.query;
+    try {
+        let response;
+
+        if(timeslotId)
+            response = await TimeSlot.findById(timeslotId);
+        else
+            response = await TimeSlot.find();
+
+        if(!response)
+            throw new Error("No Timeslot found with the given id");
+
+        res.json({
+            success: true,
+            response 
+        });
+    } catch (error) {
+        console.error(error);
+        res.json({
+            success: false
+        });
+    }
+});
+
+// Setting up auth
 router.use(auth_middleware);
 
 // TABLES
@@ -169,30 +198,6 @@ router.put('/timeslot', async (req, res) => {
     }
 });
 
-router.get('/timeslot', async (req, res) => {
-    const { timeslotId } = req.query;
-    try {
-        let response;
-
-        if(timeslotId)
-            response = await TimeSlot.findById(timeslotId);
-        else
-            response = await TimeSlot.find();
-
-        if(!response)
-            throw new Error("No Timeslot found with the given id");
-
-        res.json({
-            success: true,
-            response 
-        });
-    } catch (error) {
-        console.error(error);
-        res.json({
-            success: false
-        });
-    }
-});
 
 router.delete('/timeslot', async (req, res) => {
     const { timeslotId } = req.body;
