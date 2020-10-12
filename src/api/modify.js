@@ -4,6 +4,7 @@ const TimeSlot = require('../models/TimeSlot');
 const Table = require('../models/Table');
 
 const auth_middleware = require('./auth_middleware');
+const Booking = require('../models/Booking');
 
 const router = express.Router();
 router.use(auth_middleware);
@@ -75,7 +76,7 @@ router.get('/table', async (req, res) => {
         else
             response = await Table.find();
 
-        if(!result)
+        if(!response)
             throw new Error("No table found with the given id");
 
         res.json({
@@ -213,6 +214,40 @@ router.delete('/timeslot', async (req, res) => {
         });
     }
 });
+
+// BOOKINGS
+
+router.get('/booking', async (req, res) => {
+    const { bookingId, year, month, day } = req.query;
+    try {
+        let response;
+        console.log(bookingId);
+        if(bookingId)
+            response = await Booking.findById(bookingId).populate('tables').exec();
+        else if (year && month && day)
+            response = await Booking.find({
+                year,
+                month,
+                day
+            }).populate('tables').exec();
+        else
+            response = await Booking.find();
+
+        if(!response)
+            throw new Error("No Bookins found");
+
+        res.json({
+            success: true,
+            response 
+        });
+    } catch (error) {
+        console.error(error);
+        res.json({
+            success: false
+        });
+    }
+});
+
 
 
 module.exports = router;

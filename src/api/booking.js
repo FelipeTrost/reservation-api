@@ -19,7 +19,7 @@ router.post('/', async (req, res) => {
     if(!timeSlot)
       throw new Error("No time slot found");
 
-    if(nOpersons <= 0 || nOpersons > 10)
+    if(nOpersons <= 0)
       throw new Error("Invalid number of persons");
 
     const {year, month, day, time} = date;
