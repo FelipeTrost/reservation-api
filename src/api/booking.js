@@ -66,13 +66,15 @@ router.post('/', async (req, res) => {
 
     // selecting tables
     let selectedTables = [];
+    let smallestTable = Infinity;
     let peopleLeft = nOpersons;
 
     // First we see if we can sit them in one table
     for (const table of possibleTables) {
-      if(table.capacity >= nOpersons){
-        selectedTables.push(table._id)
+      if(table.capacity >= nOpersons && table.capacity < smallestTable){
+        selectedTables = [table._id]
         peopleLeft = 0
+        smallestTable = table.capacity;
       }
     }
 
@@ -87,6 +89,7 @@ router.post('/', async (req, res) => {
       }
 
       index++
+      console.log("Index", index, "pppl left", peopleLeft);
     }
 
     if(selectedTables.length == 0 || peopleLeft > 0)
