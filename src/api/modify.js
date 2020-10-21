@@ -5,6 +5,7 @@ const Table = require('../models/Table');
 
 const auth_middleware = require('./auth_middleware');
 const Booking = require('../models/Booking');
+const mongoose = require('mongoose');
 
 const router = express.Router();
 
@@ -36,7 +37,7 @@ router.get('/timeslot', async (req, res) => {
 });
 
 // Setting up auth
-router.use(auth_middleware);
+// router.use(auth_middleware);
 
 // TABLES
 
@@ -253,6 +254,39 @@ router.get('/booking', async (req, res) => {
     }
 });
 
+router.get('/bookingcomplete', async (req, res) => {
+    const { year, month, day } = req.query;
+    try {
+        const tables = await Table.find();
+
+        const populatedTables = []
+        for(let table of tables){
+            const bookings = await Booking.find({
+                year,
+                month,
+                day,
+                tables: {$all: [mongoose.Types.ObjectId(table.id)]}
+            })
+            .populate('timeslot')
+            .exec();
+
+            const sortedBookings = bookings.sort((bookingA, bookingB) => bookingA.timeslot.start - bookingB.timeslot.start)
+            
+            populatedTables.push({...table._doc, bookings: sortedBookings});
+        }
+
+
+        res.json({
+            success: true,
+            response: populatedTables
+        });
+    } catch (error) {
+        console.error(error);
+        res.json({
+            success: false
+        });
+    }
+});
 
 
 module.exports = router;
