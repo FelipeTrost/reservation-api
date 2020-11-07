@@ -256,8 +256,11 @@ router.get('/booking', async (req, res) => {
 
 router.get('/bookingcomplete', async (req, res) => {
     const { year, month, day } = req.query;
+
+    
     try {
         const tables = await Table.find();
+        const timeSlots = await TimeSlot.find();
 
         const populatedTables = []
         for(let table of tables){
@@ -270,15 +273,30 @@ router.get('/bookingcomplete', async (req, res) => {
             .populate('timeslot')
             .exec();
 
-            const sortedBookings = bookings.sort((bookingA, bookingB) => bookingA.timeslot.start - bookingB.timeslot.start)
-            
-            populatedTables.push({...table._doc, bookings: sortedBookings});
-        }
+            const sortedBookings = bookings.sort((bookingA, bookingB) => bookingA.timeslot.start - bookingB.timeslot.start);
 
+            // Order the bookings into their respective timeslots
+            const orderedBookings = bookings.reduce((acc, val) => {
+                const timeSlotId = val.timeslot._id
+                acc[timeSlotId] = val;
+
+                return acc
+            }, {})
+
+            
+            populatedTables.push({
+                ...table._doc, 
+                bookings: sortedBookings,
+                orderedBookings
+            });
+        }
 
         res.json({
             success: true,
-            response: populatedTables
+            response: {
+                tables: populatedTables,
+                timeSlots
+            }
         });
     } catch (error) {
         console.error(error);
